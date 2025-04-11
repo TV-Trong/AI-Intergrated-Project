@@ -2,23 +2,31 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
 using TMPro;
-using Newtonsoft.Json; //Make sure Newtonsoft is installed!
+using Newtonsoft.Json;
+using System.IO;
+using System;
+using Unity.Tutorials.Core.Editor; //Make sure Newtonsoft is installed!
 
 public class LocalAIDialogue : MonoBehaviour
 {
     [SerializeField] private TMP_InputField promptField;
+    [SerializeField] private TextMeshProUGUI responseTMP;
+
     private string apiUrl = "http://localhost:11434/api/generate"; // Ollama API
 
-    // JSON class to parse response
-    [System.Serializable]
-    private class AIResponse
+
+    public void SubmitPrompt()
     {
-        public string response; // Extracting only the text response
+        Debug.Log("User Input: " + promptField.text);
+        promptField.text += " || Response with immidiate and short answer like human conversation and do not use special character like * or use bulleting and numbering in your response";
+        StartCoroutine(StreamResponse(promptField.text));
+        promptField.text = "";
+        responseTMP.text = "Thinking...";
     }
 
-    public IEnumerator GetResponse(string prompt, System.Action<string> callback)
+    public IEnumerator StreamResponse(string prompt)
     {
-        string jsonData = "{\"model\":\"mistral\",\"prompt\":\"" + prompt + "\",\"stream\":false}";
+        string jsonData = "{\"model\":\"gemma3:4b\",\"prompt\":\"" + prompt + "\",\"stream\":true}";
 
         using (UnityWebRequest request = new UnityWebRequest(apiUrl, "POST"))
         {
@@ -27,35 +35,53 @@ public class LocalAIDialogue : MonoBehaviour
             request.downloadHandler = new DownloadHandlerBuffer();
             request.SetRequestHeader("Content-Type", "application/json");
 
-            yield return request.SendWebRequest();
+            request.SendWebRequest();
 
-            if (request.result == UnityWebRequest.Result.Success)
+            string fullResponse = "";
+            int lastProcessedLength = 0;
+
+            while (!request.isDone)
             {
-                string jsonResponse = request.downloadHandler.text;
-                Debug.Log("Full JSON Response: " + jsonResponse);
+                string fullRaw = request.downloadHandler.text;
 
-                //Parse only the "response" field
-                AIResponse aiResponse = JsonConvert.DeserializeObject<AIResponse>(jsonResponse);
-                if (aiResponse != null)
+                if (fullRaw.Length > lastProcessedLength)
                 {
-                    callback(aiResponse.response); // Return only the actual AI response
+                    string newData = fullRaw.Substring(lastProcessedLength);
+                    lastProcessedLength = fullRaw.Length;
+
+                    using (StringReader reader = new StringReader(newData))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            if (!string.IsNullOrWhiteSpace(line))
+                            {
+                                AIStreamResponse chunk = JsonConvert.DeserializeObject<AIStreamResponse>(line);
+                                if (chunk != null && chunk.response != null)
+                                {
+                                    fullResponse += chunk.response;
+                                    responseTMP.text = fullResponse;
+                                }
+                            }
+                        }
+                    }
                 }
-                else
-                {
-                    callback("Error: Could not parse response.");
-                }
+
+                yield return null;
             }
-            else
+
+            if (request.result != UnityWebRequest.Result.Success)
             {
                 Debug.LogError("AI Error: " + request.error);
-                callback("Error retrieving response.");
+                responseTMP.text = "Error getting AI response.";
             }
         }
     }
+}
 
-    public void SubmitPrompt()
-    {
-        Debug.Log("User Input: " + promptField.text);
-        StartCoroutine(GetResponse(promptField.text, response => Debug.Log("AI Says: " + response)));
-    }
+[Serializable]
+public class AIStreamResponse
+{
+    public string response;
+    public bool done;
 }
