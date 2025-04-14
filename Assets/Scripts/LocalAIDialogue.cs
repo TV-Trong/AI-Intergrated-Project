@@ -11,6 +11,9 @@ public class LocalAIDialogue : MonoBehaviour
 {
     [SerializeField] private TMP_InputField promptField;
     [SerializeField] private TextMeshProUGUI responseTMP;
+    [TextArea(3, 10)]
+    [SerializeField] private string addedCondition;
+    [SerializeField] private string modelName;
 
     private string apiUrl = "http://localhost:11434/api/generate"; // Ollama API
 
@@ -18,7 +21,8 @@ public class LocalAIDialogue : MonoBehaviour
     public void SubmitPrompt()
     {
         Debug.Log("User Input: " + promptField.text);
-        promptField.text += " || Response with immidiate and short answer like human conversation and do not use special character like * or use bulleting and numbering in your response";
+        promptField.text += $"|| {addedCondition}";
+        ;
         StartCoroutine(StreamResponse(promptField.text));
         promptField.text = "";
         responseTMP.text = "Thinking...";
@@ -26,7 +30,7 @@ public class LocalAIDialogue : MonoBehaviour
 
     public IEnumerator StreamResponse(string prompt)
     {
-        string jsonData = "{\"model\":\"gemma3:4b\",\"prompt\":\"" + prompt + "\",\"stream\":true}";
+        string jsonData = "{\"model\":\"" + modelName + "\",\"prompt\":\"" + prompt + "\",\"stream\":true}";
 
         using (UnityWebRequest request = new UnityWebRequest(apiUrl, "POST"))
         {

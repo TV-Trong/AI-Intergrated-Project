@@ -1606,7 +1606,6 @@ GameObject:
   - component: {fileID: 1917657933}
   - component: {fileID: 1917657932}
   - component: {fileID: 1917657936}
-  - component: {fileID: 1917657937}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1714,18 +1713,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   promptField: {fileID: 1694637162}
   responseTMP: {fileID: 1783416625}
---- !u!114 &1917657937
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1917657931}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2bcb64aa31619d4bb3e2bae9e8a252e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  addedCondition: roleplay sun goku in dragon ball and response in an video game
+    character, short and simple
+  modelName: Tohur/natsumura-storytelling-rp-llama-3.1
 --- !u!1 &2119057297
 GameObject:
   m_ObjectHideFlags: 0
