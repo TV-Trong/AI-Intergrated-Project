@@ -11,21 +11,43 @@ public class LocalAIDialogue : MonoBehaviour
 {
     [SerializeField] private TMP_InputField promptField;
     [SerializeField] private TextMeshProUGUI responseTMP;
+    [SerializeField] private TMP_Dropdown characterDropdown;
+    private string character;
     [TextArea(3, 10)]
     [SerializeField] private string addedCondition;
     [SerializeField] private string modelName;
 
+    [SerializeField] private Animator faceAnim;
+    [SerializeField] private AnimationClip[] animClips;
+
     private string apiUrl = "http://localhost:11434/api/generate"; // Ollama API
 
+    private void Start()
+    {
+        character = characterDropdown.options[0].text; // Default character
+        characterDropdown.onValueChanged.AddListener(ChangeCharacter);
+    }
+
+    private void ChangeCharacter(int index)
+    {
+        character = characterDropdown.options[index].text;
+    }
 
     public void SubmitPrompt()
     {
         Debug.Log("User Input: " + promptField.text);
-        promptField.text += $"|| {addedCondition}";
+        promptField.text += $". Imagine your are {character}, {addedCondition}";
         ;
         StartCoroutine(StreamResponse(promptField.text));
         promptField.text = "";
         responseTMP.text = "Thinking...";
+        Invoke(nameof(PlayRandomAnim), 1f);
+    }
+
+    void PlayRandomAnim()
+    {
+        int index = UnityEngine.Random.Range(0, animClips.Length);
+        faceAnim.Play($"Anim 1");
     }
 
     public IEnumerator StreamResponse(string prompt)
