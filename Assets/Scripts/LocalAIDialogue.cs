@@ -1,11 +1,10 @@
+using System;
 using System.Collections;
+using System.IO;
+using Newtonsoft.Json;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using TMPro;
-using Newtonsoft.Json;
-using System.IO;
-using System;
-using Unity.Tutorials.Core.Editor; //Make sure Newtonsoft is installed!
 
 public class LocalAIDialogue : MonoBehaviour
 {
@@ -47,7 +46,7 @@ public class LocalAIDialogue : MonoBehaviour
     void PlayRandomAnim()
     {
         int index = UnityEngine.Random.Range(0, animClips.Length);
-        faceAnim.Play($"Anim 1");
+        faceAnim.Play($"Anim {index + 1}");
     }
 
     public IEnumerator StreamResponse(string prompt)

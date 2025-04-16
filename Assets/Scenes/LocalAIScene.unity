@@ -4339,6 +4339,8 @@ MonoBehaviour:
   faceAnim: {fileID: 569532203}
   animClips:
   - {fileID: 7400000, guid: 825aef23a353a6a408194ddc70896f40, type: 2}
+  - {fileID: 7400000, guid: a71620be480967d45bcf405c9f14e007, type: 2}
+  - {fileID: 7400000, guid: f95648a72f7a45f4f862c001e32c5d34, type: 2}
 --- !u!1 &1984535388
 GameObject:
   m_ObjectHideFlags: 0
